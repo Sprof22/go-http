@@ -1,3 +1,4 @@
+// http.go
 package http
 
 import (
@@ -5,11 +6,13 @@ import (
 	"net/http"
 )
 
-func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, world!")
+func HelloWorldHandler(w http.ResponseWriter, r *http.Request, message *string) {
+	fmt.Fprintln(w, *message)
 }
 
-func StartServer() {
-	http.HandleFunc("/hello", HelloWorldHandler)
+func StartServer(message *string) {
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+		HelloWorldHandler(w, r, message)
+	})
 	http.ListenAndServe(":8080", nil)
 }
