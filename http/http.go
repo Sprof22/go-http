@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-	"time"
 )
 
 var message = ""
 var mu sync.Mutex
+var syncChannel = make(chan struct{})
 
 func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
-	message := getMessage() //get the message
+	message := getMessage()
 	fmt.Fprintln(w, message)
 }
 
@@ -22,17 +22,17 @@ func getMessage() string {
 }
 
 func addHello() {
-	time.Sleep(5 * time.Second)
 	mu.Lock()
 	defer mu.Unlock()
 	message += "Hello"
+	syncChannel <- struct{}{}
 }
 
 func addWorld() {
-	time.Sleep(10 * time.Second)
+	<-syncChannel
 	mu.Lock()
 	defer mu.Unlock()
-	message += " world!"
+	message += " World!"
 }
 
 func StartServer() {
