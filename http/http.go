@@ -13,8 +13,14 @@ var syncChannel = make(chan struct{})
 func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
+	addHello()
+	addWorld()
 	message := getMessage()
 	fmt.Fprintln(w, message)
+}
+
+func GoodMorningHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintln(w, "Good morning")
 }
 
 func getMessage() string {
@@ -37,7 +43,6 @@ func addWorld() {
 
 func StartServer() {
 	http.HandleFunc("/hello", HelloWorldHandler)
-	go addHello()
-	go addWorld()
+	http.HandleFunc("/greeting", GoodMorningHandler)
 	http.ListenAndServe(":8080", nil)
 }
